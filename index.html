@@ -81,10 +81,47 @@
             font-weight: 900; text-transform: uppercase;
         }
 
-        .history-row { display: flex; justify-content: space-between; padding: 12px; font-family: monospace; font-size: 12px; align-items: flex-start; flex-direction: column; }
-        .history-row:nth-child(odd) { background-color: #161616; }
-        .history-row .row-main { display: flex; justify-content: space-between; width: 100%; align-items: center; }
-        .history-row .row-comment { display: flex; width: 100%; margin-top: 6px; padding-left: 8px; }
+        .history-row {
+            position: relative;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .history-row:nth-child(odd) {
+            background-color: #161616;
+        }
+
+        .history-content {
+            padding-right: 32px; /* reemplaza pr-8 */
+            width: 100%;
+        }
+
+        .history-line1 {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .history-line2 {
+            font-weight: bold;
+            font-size: 14px;
+            text-align: right;
+            width: 100%;
+        }
+
+        .history-comment {
+            margin-top: 6px;
+            padding-left: 8px;
+            text-align: left;
+        }
+
+        .history-edit {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
 
         .session-row { display: flex; flex-direction: column; padding: 14px 12px; font-family: monospace; font-size: 12px; position: relative; gap: 6px; }
         .session-row:nth-child(odd) { background-color: #161616; }
@@ -93,6 +130,14 @@
     </style>
 </head>
 <body>
+
+<!-- SVG GLOBAL ICONS -->
+<svg style="display:none;">
+  <symbol id="icon-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"></path>
+    <path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"></path>
+  </symbol>
+</svg>    
 
 <div class="app-container">
     
@@ -165,12 +210,12 @@
 
             <div onclick="showScreen('screen-history')" class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 space-y-2 cursor-pointer active:bg-zinc-800 transition-colors">
                 <div class="flex justify-between items-center">
-                    <span class="text-[9px] text-zinc-500 uppercase font-bold tracking-tighter">Pre-Last (Pos #1)</span>
-                    <span class="font-mono font-bold text-xs"><span class="brand-yellow">29 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
+                    <span class="text-[10px] text-zinc-500 uppercase font-bold tracking-tighter">Pre-Last (Pos #1)</span>
+                    <span class="font-mono font-bold text-sm"><span class="brand-yellow">29 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span class="text-[9px] text-zinc-500 uppercase font-bold tracking-tighter">Last (Pos #1)</span>
-                    <span class="font-mono font-bold text-xs"><span class="brand-yellow">30 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">9 x 42.5kg</span></span>
+                    <span class="text-[10px] text-zinc-500 uppercase font-bold tracking-tighter">Last (Pos #1)</span>
+                    <span class="font-mono font-bold text-sm"><span class="brand-yellow">30 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">9 x 42.5kg</span></span>
                 </div>
             </div>
         </div>
@@ -180,42 +225,43 @@
                 <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-brand-yellow">
                     <div class="flex items-center justify-center gap-6">
                         <div class="flex items-center">
-                            <span class="text-[10px] text-zinc-600 font-bold italic mr-2">REPS</span>
+                            <span class="text-[10px] brand-yellow font-bold italic mr-2">REPS</span>
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" placeholder="0" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
                         </div>
-                        <span class="brand-yellow text-2xl font-bold mb-1">x</span>
+                        <span class="text-zinc-600 text-2xl font-bold mb-1">x</span>
                         <div class="flex items-center">
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" value="35" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
-                            <span class="text-[10px] text-zinc-600 font-bold italic ml-2">KG</span>
+                            <span class="text-[10px] brand-yellow font-bold italic ml-2">KG</span>
                         </div>
                     </div>
                 </div>
+
                 <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-zinc-800">
                     <div class="flex items-center justify-center gap-6">
                         <div class="flex items-center">
-                            <span class="text-[10px] text-zinc-600 font-bold italic mr-2">REPS</span>
+                            <span class="text-[10px] brand-yellow font-bold italic mr-2">REPS</span>
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" placeholder="0" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
                         </div>
-                        <span class="brand-yellow text-2xl font-bold mb-1">x</span>
+                        <span class="text-zinc-600 text-2xl font-bold mb-1">x</span>
                         <div class="flex items-center">
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" value="35" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
-                            <span class="text-[10px] text-zinc-600 font-bold italic ml-2">KG</span>
+                            <span class="text-[10px] brand-yellow font-bold italic ml-2">KG</span>
                         </div>
                     </div>
                 </div>
@@ -249,42 +295,43 @@
                 <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-brand-yellow">
                     <div class="flex items-center justify-center gap-6">
                         <div class="flex items-center">
-                            <span class="text-[10px] text-zinc-600 font-bold italic mr-2">REPS</span>
+                            <span class="text-[10px] brand-yellow font-bold italic mr-2">REPS</span>
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" value="27" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
                         </div>
-                        <span class="brand-yellow text-2xl font-bold mb-1">x</span>
+                        <span class="text-zinc-600 text-2xl font-bold mb-1">x</span>
                         <div class="flex items-center">
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" value="35" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
-                            <span class="text-[10px] text-zinc-600 font-bold italic ml-2">KG</span>
+                            <span class="text-[10px] brand-yellow font-bold italic ml-2">KG</span>
                         </div>
                     </div>
                 </div>
+
                 <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-zinc-800">
                     <div class="flex items-center justify-center gap-6">
                         <div class="flex items-center">
-                            <span class="text-[10px] text-zinc-600 font-bold italic mr-2">REPS</span>
+                            <span class="text-[10px] brand-yellow font-bold italic mr-2">REPS</span>
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" value="8" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
                         </div>
-                        <span class="brand-yellow text-2xl font-bold mb-1">x</span>
+                        <span class="text-zinc-600 text-2xl font-bold mb-1">x</span>
                         <div class="flex items-center">
                             <div class="flex flex-col items-center">
                                 <button class="text-brand-yellow text-2xl mb-3">▲</button>
                                 <input type="number" value="42.5" style="width: 100px;">
                                 <button class="text-brand-yellow text-2xl mt-3">▼</button>
                             </div>
-                            <span class="text-[10px] text-zinc-600 font-bold italic ml-2">KG</span>
+                            <span class="text-[10px] brand-yellow font-bold italic ml-2">KG</span>
                         </div>
                     </div>
                 </div>
@@ -294,7 +341,7 @@
                 <button class="w-full py-4 border border-dashed border-zinc-800 rounded-2xl brand-yellow font-bold text-xs uppercase tracking-widest">+ Agregar Serie</button>
                 <div class="w-full py-4 bg-zinc-900/40 border border-zinc-800 rounded-2xl flex items-center justify-between px-6">
                     <span class="text-soft-red font-bold text-xs italic">Hice en otra maquina</span>
-                    <button class="brand-yellow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"/><path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"/></svg></button>
+                    <button class="brand-yellow"><svg width="18" height="18"><use href="#icon-edit"></use></svg></button>
                 </div>
                 <button class="w-full py-4 bg-brand-yellow text-black rounded-xl font-black italic uppercase text-xs tracking-widest shadow-lg">Guardar Cambios</button>
             </div>
@@ -307,53 +354,130 @@
                 <button onclick="showScreen('screen-exercise')" class="text-zinc-500 text-2xl">←</button>
                 <h2 class="text-xl font-black uppercase italic">Historial</h2>
             </div>
-            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2 px-2 flex justify-between">
+
+            <!-- headers -->
+            <div class="text-[11px] text-zinc-500 font-bold uppercase tracking-widest mb-2 px-2 flex justify-between pr-12">
                 <span>Fecha / Posición</span>
                 <span>Series Realizadas</span>
             </div>
+
             <div class="border-t border-zinc-900 overflow-y-auto hide-scrollbar">
-                <div class="history-row" onclick="showScreen('screen-edit-series')">
-                    <div class="row-main">
-                        <span>Viernes <span class="brand-yellow ml-2">(Pos #1)</span></span>
-                        <span class="text-right"><span class="brand-yellow">29 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
+
+                <!-- ROW TEMPLATE -->
+                <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
+
+                    <div class="pr-4 w-full">
+
+                        <div class="text-sm font-mono font-bold">
+                            Viernes <span class="text-zinc-700">(Pos #1)</span>
+                        </div>
+
+                        <div class="text-sm font-mono font-bold text-right w-full">
+                            <span class="brand-yellow">29 x 35kg</span>
+                            <span class="text-zinc-700">|</span>
+                            <span class="text-zinc-500">10 x 42.5kg</span>
+                        </div>
+
                     </div>
+
+                    <button onclick="showScreen('screen-edit-series')" class="brand-yellow">
+                        <svg width="18" height="18"><use href="#icon-edit"></use></svg>
+                    </button>
+
                 </div>
-                <div class="history-row">
-                    <div class="row-main">
-                        <span>Miercoles <span class="text-zinc-600 ml-2">(Pos #2)</span></span>
-                        <span class="text-right"><span class="brand-yellow">21 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">6 x 42.5kg</span></span>
+
+                <!-- ROW -->
+                <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
+                    <div class="pr-4 w-full">
+                        <div class="text-sm font-mono font-bold">
+                            Miercoles <span class="text-zinc-700">(Pos #2)</span>
+                        </div>
+                        <div class="text-sm font-mono font-bold text-right w-full">
+                            <span class="brand-yellow">21 x 35kg</span>
+                            <span class="text-zinc-700">|</span>
+                            <span class="text-zinc-500">6 x 42.5kg</span>
+                        </div>
                     </div>
+                    <button onclick="showScreen('screen-edit-series')" class="brand-yellow">
+                        <svg width="18" height="18"><use href="#icon-edit"></use></svg>
+                    </button>
                 </div>
-                <div class="history-row">
-                    <div class="row-main">
-                        <span>2 Febrero <span class="brand-yellow ml-2">(Pos #1)</span></span>
-                        <span class="text-right"><span class="brand-yellow">28 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">9 x 42.5kg</span></span>
+
+                <!-- ROW -->
+                <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
+                    <div class="pr-4 w-full">
+                        <div class="text-sm font-mono font-bold">
+                            2 Febrero <span class="text-zinc-700">(Pos #1)</span>
+                        </div>
+                        <div class="text-sm font-mono font-bold text-right w-full">
+                            <span class="brand-yellow">28 x 35kg</span>
+                            <span class="text-zinc-700">|</span>
+                            <span class="text-zinc-500">9 x 42.5kg</span>
+                        </div>
                     </div>
+                    <button onclick="showScreen('screen-edit-series')" class="brand-yellow">
+                        <svg width="18" height="18"><use href="#icon-edit"></use></svg>
+                    </button>
                 </div>
-                <div class="history-row">
-                    <div class="row-main">
-                        <span>30 Enero <span class="text-zinc-600 ml-2">(Pos #2)</span></span>
-                        <span class="text-right"><span class="brand-yellow">22 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
+
+                <!-- ROW -->
+                <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
+                    <div class="pr-4 w-full">
+                        <div class="text-sm font-mono font-bold">
+                            30 Enero <span class="text-zinc-700">(Pos #2)</span>
+                        </div>
+                        <div class="text-sm font-mono font-bold text-right w-full">
+                            <span class="brand-yellow">22 x 35kg</span>
+                            <span class="text-zinc-700">|</span>
+                            <span class="text-zinc-500">10 x 42.5kg</span>
+                        </div>
                     </div>
+                    <button onclick="showScreen('screen-edit-series')" class="brand-yellow">
+                        <svg width="18" height="18"><use href="#icon-edit"></use></svg>
+                    </button>
                 </div>
-                <div class="history-row" onclick="showScreen('screen-edit-series')">
-                    <div class="row-main">
-                        <span>28 Enero <span class="brand-yellow ml-2">(Pos #1)</span></span>
-                        <span class="text-right"><span class="brand-yellow">27 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">8 x 42.5kg</span></span>
+
+                <!-- ROW CON COMENTARIO -->
+                <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
+                    <div class="pr-4 w-full">
+                        <div class="text-sm font-mono font-bold">
+                            28 Enero <span class="text-zinc-700">(Pos #1)</span>
+                        </div>
+                        <div class="text-sm font-mono font-bold text-right w-full">
+                            <span class="brand-yellow">27 x 35kg</span>
+                            <span class="text-zinc-700">|</span>
+                            <span class="text-zinc-500">8 x 42.5kg</span>
+                        </div>
+                        <div class="row-comment text-soft-red text-xs">
+                            ↳ Hice en otra maquina
+                        </div>
                     </div>
-                    <div class="row-comment">
-                        <span class="text-soft-red text-xs">↳ Hice en otra maquina</span>
-                    </div>
+                    <button onclick="showScreen('screen-edit-series')" class="brand-yellow">
+                        <svg width="18" height="18"><use href="#icon-edit"></use></svg>
+                    </button>
                 </div>
-                <div class="history-row">
-                    <div class="row-main">
-                        <span>26 Enero <span class="text-zinc-600 ml-2">(Pos #2)</span></span>
-                        <span class="text-right"><span class="brand-yellow">20 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">5 x 42.5kg</span></span>
+
+                <!-- ROW -->
+                <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
+                    <div class="pr-4 w-full">
+                        <div class="text-sm font-mono font-bold">
+                            26 Enero <span class="text-zinc-700">(Pos #2)</span>
+                        </div>
+                        <div class="text-sm font-mono font-bold text-right w-full">
+                            <span class="brand-yellow">20 x 35kg</span>
+                            <span class="text-zinc-700">|</span>
+                            <span class="text-zinc-500">5 x 42.5kg</span>
+                        </div>
                     </div>
+                    <button onclick="showScreen('screen-edit-series')" class="brand-yellow">
+                        <svg width="18" height="18"><use href="#icon-edit"></use></svg>
+                    </button>
                 </div>
+
             </div>
         </div>
     </section>
+
 
     <section id="screen-routine-manager" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
         <div class="flex items-center gap-4 mb-8">
@@ -370,14 +494,14 @@
                 <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex justify-between items-center">
                     <span class="font-bold italic uppercase text-sm">Día 1: Arranque en pecho</span>
                     <div class="flex gap-4">
-                        <button onclick="showScreen('screen-edit-day')" class="brand-yellow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"/><path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"/></svg></button>
+                        <button onclick="showScreen('screen-edit-day')" class="brand-yellow"><svg width="18" height="18"><use href="#icon-edit"></use></svg></button>
                         <button class="brand-yellow font-black text-base">✕</button>
                     </div>
                 </div>
                 <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex justify-between items-center">
                     <span class="font-bold italic uppercase text-sm">Día 2: Arranque en hombros</span>
                     <div class="flex gap-4">
-                        <button onclick="showScreen('screen-edit-day')" class="brand-yellow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"/><path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"/></svg></button>
+                        <button onclick="showScreen('screen-edit-day')" class="brand-yellow"><svg width="18" height="18"><use href="#icon-edit"></use></svg></button>
                         <button class="brand-yellow font-black text-base">✕</button>
                     </div>
                 </div>
