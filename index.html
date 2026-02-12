@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RawLog">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0a">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { width: 4px; }
+        .hide-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .hide-scrollbar { scrollbar-width: thin; scrollbar-color: #333 transparent; }
+        
+        body { 
+            background-color: #0a0a0a; 
+            color: #fff; 
+            font-family: system-ui, sans-serif; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; margin: 0; overflow: hidden; 
+        }
+        
+        .app-container {
+            width: 100%; max-width: 420px; height: 100vh;
+            background-color: #000; position: relative; 
+            display: flex; flex-direction: column; overflow: hidden; 
+        }
+
+        @media (min-width: 450px) { 
+            .app-container { 
+                height: 850px; border: 2px solid #1a1a1a; 
+                border-radius: 40px; box-shadow: 0 0 100px rgba(0,0,0,0.8); 
+            } 
+        }
+
+        .brand-yellow { color: #eab308; }
+        .bg-brand-yellow { background-color: #eab308; }
+        .border-brand-yellow { border-color: #eab308; }
+        .bg-soft-red { background-color: #b91c1c; }
+        .text-soft-red { color: #b91c1c; }
+
+        input, select { 
+            background: #111 !important; 
+            border: 1px solid #333 !important; 
+            color: #fff !important; 
+            text-align: center; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            width: 80px; height: 80px; 
+            font-size: 1.875rem;
+            line-height: normal;
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] { -moz-appearance: textfield; }
+
+        .hidden { display: none; }
+
+        .footer-gradient {
+            background: linear-gradient(to top, rgba(0,0,0,1) 70%, rgba(0,0,0,0) 100%);
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px 24px 24px 24px; pointer-events: none;
+        }
+
+        .btn-config-top { position: absolute; top: 30px; right: 25px; z-index: 50; }
+
+        .badge-next {
+            position: absolute; top: 0; right: 0;
+            background-color: #eab308; color: black;
+            padding: 0px 10px; border-bottom-left-radius: 12px;
+            border-top-right-radius: 15px; font-size: 10px;
+            font-weight: 900; text-transform: uppercase;
+        }
+
+        .history-row { display: flex; justify-content: space-between; padding: 12px; font-family: monospace; font-size: 12px; align-items: flex-start; flex-direction: column; }
+        .history-row:nth-child(odd) { background-color: #161616; }
+        .history-row .row-main { display: flex; justify-content: space-between; width: 100%; align-items: center; }
+        .history-row .row-comment { display: flex; width: 100%; margin-top: 6px; padding-left: 8px; }
+
+        .session-row { display: flex; flex-direction: column; padding: 14px 12px; font-family: monospace; font-size: 12px; position: relative; gap: 6px; }
+        .session-row:nth-child(odd) { background-color: #161616; }
+        .session-row .row-top { display: flex; justify-content: space-between; width: 100%; align-items: center; }
+        .session-row .row-bottom { display: flex; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <section id="screen-home" class="p-6 flex-1 overflow-y-auto hide-scrollbar relative">
+        <button onclick="showScreen('screen-routine-manager')" class="btn-config-top">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.488.488 0 0 0-.12-.61l-2.03-1.58zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+        </button>
+        <header class="mb-10 mt-6 text-center">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase">GYM<span class="brand-yellow">PRO</span></h1>
+            <p class="text-zinc-500 text-[10px] uppercase tracking-[0.3em] mt-1 font-bold">Domingo 1 de Febrero</p>
+        </header>
+        <div class="flex items-center relative mb-3">
+            <div class="flex-1 flex justify-center">
+                <h2 class="font-bold italic uppercase tracking-tight text-base">Rutina: <span class="brand-yellow">Full Body Dual</span></h2>
+            </div>
+        </div>
+        <div class="space-y-3">
+            <div onclick="showScreen('screen-list', 'Día 1: Arranque en pecho')" class="relative p-6 bg-zinc-900 border border-zinc-800 rounded-2xl cursor-pointer">
+                <h2 class="text-xl font-bold italic uppercase">Día 1: Arranque en pecho</h2>
+                <p class="text-zinc-500 text-[10px] mt-1 uppercase tracking-widest font-bold">8 ejercicios • Viernes</p>
+            </div>
+            <div onclick="showScreen('screen-list', 'Día 2: Arranque en hombros')" class="relative p-6 bg-zinc-900 border border-zinc-800 rounded-2xl cursor-pointer">
+                <div class="badge-next">Siguiente</div>
+                <h2 class="text-xl font-bold italic uppercase">Día 2: Arranque en hombros</h2>
+                <p class="text-zinc-500 text-[10px] mt-1 uppercase tracking-widest font-bold">8 ejercicios • Miércoles</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-list" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-4">
+            <button onclick="showScreen('screen-home')" class="text-zinc-500 text-2xl">←</button>
+            <h2 id="list-title" class="text-xl font-bold italic uppercase leading-tight">Día 1</h2>
+        </div>
+        <div class="flex items-center justify-between gap-4 mb-6">
+            <button class="bg-soft-red text-white px-4 py-2 rounded-lg font-black italic uppercase text-[10px] tracking-widest shadow-lg">Finalizar</button>
+            <div class="flex items-center font-mono font-bold text-xs">
+                <span class="brand-yellow">(now) 00:07 min</span>
+                <span class="text-zinc-700 mx-2">|</span>
+                <span class="text-zinc-600">(Last) 01:23 min</span>
+            </div>
+        </div>
+        <div class="space-y-3">
+            <div onclick="showScreen('screen-exercise', 'Pecho Plano Smith')" class="p-3 bg-zinc-900 flex flex-col rounded-xl border-l-4 border-brand-yellow cursor-pointer">
+                <span class="font-bold text-zinc-200 uppercase text-sm italic mb-1">1. Pecho Plano Smith</span>
+                <div class="text-right w-full"><span class="text-xs font-mono font-bold"><span class="brand-yellow">(now) 27 x 35kg</span><span class="text-zinc-700 mx-1">|</span><span class="text-zinc-500">(Last) 30 x 35kg</span></span></div>
+            </div>
+            <div onclick="showScreen('screen-exercise', 'Dorsal Adelante')" class="p-3 bg-zinc-900 flex flex-col rounded-xl border-l-4 border-zinc-800 cursor-pointer">
+                <span class="font-bold text-zinc-200 uppercase text-sm italic mb-1">2. Dorsal Adelante</span>
+                <div class="text-right w-full"><span class="text-xs font-mono font-bold"><span class="brand-yellow">(now) 35 x 40kg</span><span class="text-zinc-700 mx-1">|</span><span class="text-zinc-500">(Last) 34 x 40kg</span></span></div>
+            </div>
+            <div onclick="showScreen('screen-exercise', 'Hombros Arriba Maquina')" class="p-3 bg-zinc-900 flex flex-col rounded-xl border-l-4 border-zinc-800 cursor-pointer">
+                <span class="font-bold text-zinc-200 uppercase text-sm italic mb-1">3. Hombros Arriba Maquina</span>
+                <div class="text-right w-full"><span class="text-xs font-mono font-bold"><span class="text-zinc-500">(Last) 21 x 30kg</span></span></div>
+            </div>
+            <div onclick="showScreen('screen-exercise', 'Cuadriceps Camilla')" class="p-3 bg-zinc-900 flex flex-col rounded-xl border-l-4 border-zinc-800 cursor-pointer">
+                <span class="font-bold text-zinc-200 uppercase text-sm italic mb-1">4. Cuadriceps Camilla</span>
+                <div class="text-right w-full"><span class="text-xs font-mono font-bold"><span class="text-zinc-500">(Last) 21 x 35kg</span></span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-exercise" class="hidden flex-1 flex flex-col overflow-hidden relative">
+        <div class="p-6 bg-black z-10">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showScreen('screen-list')" class="text-zinc-500 text-xl">✕</button>
+                <h2 id="exercise-title" class="text-xl font-black uppercase italic tracking-tight">Pecho Smith</h2>
+                <div class="w-6"></div>
+            </div>
+
+            <div onclick="showScreen('screen-history')" class="bg-zinc-900 p-3 rounded-xl border border-zinc-800 space-y-2 cursor-pointer active:bg-zinc-800 transition-colors">
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] text-zinc-500 uppercase font-bold tracking-tighter">Pre-Last (Pos #1)</span>
+                    <span class="font-mono font-bold text-xs"><span class="brand-yellow">29 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-[9px] text-zinc-500 uppercase font-bold tracking-tighter">Last (Pos #1)</span>
+                    <span class="font-mono font-bold text-xs"><span class="brand-yellow">30 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">9 x 42.5kg</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto hide-scrollbar p-4 pb-48">
+            <div id="sets-container" class="space-y-6">
+                <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-brand-yellow">
+                    <div class="flex items-center justify-center gap-6">
+                        <div class="flex items-center">
+                            <span class="text-[10px] text-zinc-600 font-bold italic mr-1" style="margin-top: 5px;">REPS</span>
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Reps</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" placeholder="0" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                        </div>
+                        <span class="brand-yellow text-2xl font-bold mb-1" style="margin-top: 5px;">x</span>
+                        <div class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Kg</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" value="35" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                            <span class="text-[10px] text-zinc-600 font-bold italic ml-1" style="margin-top: 5px;">KG</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-zinc-800">
+                    <div class="flex items-center justify-center gap-6">
+                        <div class="flex items-center">
+                            <span class="text-[10px] text-zinc-600 font-bold italic mr-1" style="margin-top: 5px;">REPS</span>
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Reps</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" placeholder="0" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                        </div>
+                        <span class="brand-yellow text-2xl font-bold mb-1" style="margin-top: 5px;">x</span>
+                        <div class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Kg</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" value="35" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                            <span class="text-[10px] text-zinc-600 font-bold italic ml-1" style="margin-top: 5px;">KG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-10 space-y-4 mb-10 text-center">
+                <button class="w-full py-4 border border-dashed border-zinc-800 rounded-2xl brand-yellow font-bold text-xs uppercase tracking-widest">+ Agregar Serie</button>
+                <button class="w-full py-4 border border-dashed border-zinc-800 rounded-2xl brand-yellow font-bold text-xs uppercase tracking-widest">+ Agregar Comentario</button>
+            </div>
+        </div>
+
+        <div class="footer-gradient z-20">
+            <div class="flex justify-between gap-4 pointer-events-auto">
+                <button onclick="showScreen('screen-list')" class="flex-1 py-4 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-zinc-500 uppercase text-xs tracking-widest">Anterior</button>
+                <button class="flex-1 py-4 bg-brand-yellow text-black rounded-xl font-black italic uppercase text-xs tracking-widest shadow-lg">Siguiente</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-edit-series" class="hidden flex-1 flex flex-col overflow-hidden relative">
+        <div class="p-6 bg-black z-10">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="showScreen('screen-history')" class="text-zinc-500 text-xl">✕</button>
+                <h2 class="text-xl font-black uppercase italic tracking-tight">Pecho Smith <span class="text-soft-red ml-2">EDIT</span></h2>
+                <div class="w-6"></div>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto hide-scrollbar p-4 pb-48">
+            <div id="sets-container" class="space-y-6">
+                <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-brand-yellow">
+                    <div class="flex items-center justify-center gap-6">
+                        <div class="flex items-center">
+                            <span class="text-[10px] text-zinc-600 font-bold italic mr-1" style="margin-top: 5px;">REPS</span>
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Reps</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" value="27" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                        </div>
+                        <span class="brand-yellow text-2xl font-bold mb-1" style="margin-top: 5px;">x</span>
+                        <div class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Kg</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" value="35" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                            <span class="text-[10px] text-zinc-600 font-bold italic ml-1" style="margin-top: 5px;">KG</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative p-4 bg-zinc-900/40 rounded-r-2xl border-l-4 border-zinc-800">
+                    <div class="flex items-center justify-center gap-6">
+                        <div class="flex items-center">
+                            <span class="text-[10px] text-zinc-600 font-bold italic mr-1" style="margin-top: 5px;">REPS</span>
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Reps</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" value="8" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                        </div>
+                        <span class="brand-yellow text-2xl font-bold mb-1" style="margin-top: 5px;">x</span>
+                        <div class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <label class="text-[11px] invisible font-bold mb-1">Kg</label>
+                                <button class="text-brand-yellow text-2xl mb-3">▲</button>
+                                <input type="number" value="42.5" style="width: 100px;">
+                                <button class="text-brand-yellow text-2xl mt-3">▼</button>
+                            </div>
+                            <span class="text-[10px] text-zinc-600 font-bold italic ml-1" style="margin-top: 5px;">KG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-10 space-y-4 mb-10 text-center">
+                <button class="w-full py-4 border border-dashed border-zinc-800 rounded-2xl brand-yellow font-bold text-xs uppercase tracking-widest">+ Agregar Serie</button>
+                <div class="w-full py-4 bg-zinc-900/40 border border-zinc-800 rounded-2xl flex items-center justify-between px-6">
+                    <span class="text-soft-red font-bold text-xs italic">Hice en otra maquina</span>
+                    <button class="brand-yellow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"/><path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"/></svg></button>
+                </div>
+                <button class="w-full py-4 bg-brand-yellow text-black rounded-xl font-black italic uppercase text-xs tracking-widest shadow-lg">Guardar Cambios</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-history" class="hidden flex-1 flex flex-col overflow-hidden">
+        <div class="p-6 bg-black">
+            <div class="flex items-center gap-4 mb-6">
+                <button onclick="showScreen('screen-exercise')" class="text-zinc-500 text-2xl">←</button>
+                <h2 class="text-xl font-black uppercase italic">Historial</h2>
+            </div>
+            <div class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-2 px-2 flex justify-between">
+                <span>Fecha / Posición</span>
+                <span>Series Realizadas</span>
+            </div>
+            <div class="border-t border-zinc-900 overflow-y-auto hide-scrollbar">
+                <div class="history-row" onclick="showScreen('screen-edit-series')">
+                    <div class="row-main">
+                        <span>Viernes <span class="brand-yellow ml-2">(Pos #1)</span></span>
+                        <span class="text-right"><span class="brand-yellow">29 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
+                    </div>
+                </div>
+                <div class="history-row">
+                    <div class="row-main">
+                        <span>Miercoles <span class="text-zinc-600 ml-2">(Pos #2)</span></span>
+                        <span class="text-right"><span class="brand-yellow">21 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">6 x 42.5kg</span></span>
+                    </div>
+                </div>
+                <div class="history-row">
+                    <div class="row-main">
+                        <span>2 Febrero <span class="brand-yellow ml-2">(Pos #1)</span></span>
+                        <span class="text-right"><span class="brand-yellow">28 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">9 x 42.5kg</span></span>
+                    </div>
+                </div>
+                <div class="history-row">
+                    <div class="row-main">
+                        <span>30 Enero <span class="text-zinc-600 ml-2">(Pos #2)</span></span>
+                        <span class="text-right"><span class="brand-yellow">22 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">10 x 42.5kg</span></span>
+                    </div>
+                </div>
+                <div class="history-row" onclick="showScreen('screen-edit-series')">
+                    <div class="row-main">
+                        <span>28 Enero <span class="brand-yellow ml-2">(Pos #1)</span></span>
+                        <span class="text-right"><span class="brand-yellow">27 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">8 x 42.5kg</span></span>
+                    </div>
+                    <div class="row-comment">
+                        <span class="text-soft-red text-xs">↳ Hice en otra maquina</span>
+                    </div>
+                </div>
+                <div class="history-row">
+                    <div class="row-main">
+                        <span>26 Enero <span class="text-zinc-600 ml-2">(Pos #2)</span></span>
+                        <span class="text-right"><span class="brand-yellow">20 x 35kg</span><span class="text-zinc-700 mx-2">|</span><span class="text-zinc-500">5 x 42.5kg</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-routine-manager" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="showScreen('screen-home')" class="text-zinc-500 text-2xl">←</button>
+            <h2 class="text-xl font-black uppercase italic tracking-tight">Editar Rutina</h2>
+        </div>
+        <div class="space-y-6">
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-2 block">Nombre de Rutina</label>
+                <input type="text" value="Full Body Dual" class="w-full !text-left px-4 !h-14 !text-lg !w-full border-zinc-800">
+            </div>
+            <div class="space-y-3">
+                <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest block">Días / Bloques</label>
+                <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex justify-between items-center">
+                    <span class="font-bold italic uppercase text-sm">Día 1: Arranque en pecho</span>
+                    <div class="flex gap-4">
+                        <button onclick="showScreen('screen-edit-day')" class="brand-yellow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"/><path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"/></svg></button>
+                        <button class="brand-yellow font-black text-base">✕</button>
+                    </div>
+                </div>
+                <div class="p-4 bg-zinc-900 border border-zinc-800 rounded-xl flex justify-between items-center">
+                    <span class="font-bold italic uppercase text-sm">Día 2: Arranque en hombros</span>
+                    <div class="flex gap-4">
+                        <button onclick="showScreen('screen-edit-day')" class="brand-yellow"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13"/><path d="M18.5 2.5C18.8978 2.10217 19.4374 1.87868 20 1.87868C20.5626 1.87868 21.1022 2.10217 21.5 2.5C21.8978 2.89782 22.1213 3.43739 22.1213 4C22.1213 4.56261 21.8978 5.10217 21.5 5.5L12 15L8 16L9 12L18.5 2.5Z"/></svg></button>
+                        <button class="brand-yellow font-black text-base">✕</button>
+                    </div>
+                </div>
+                <button onclick="showScreen('screen-edit-day')" class="w-full py-3 border border-dashed border-zinc-800 rounded-xl brand-yellow font-bold text-[10px] uppercase tracking-widest">+ Añadir Nuevo Día</button>
+            </div>
+            <div class="pt-4 space-y-3">
+                <button onclick="showScreen('screen-exercise-library', null, 'view')" class="w-full py-4 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-zinc-200 uppercase text-xs tracking-widest">Ver Biblioteca de Ejercicios</button>
+                <button onclick="showScreen('screen-full-history')" class="w-full py-4 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-zinc-200 uppercase text-xs tracking-widest">Ver Historial de Entrenamientos</button>
+            </div>
+        </div>
+        <div class="mt-8">
+            <button onclick="showScreen('screen-sync')" class="w-full py-4 bg-brand-yellow text-black rounded-xl font-black italic uppercase text-xs tracking-widest shadow-lg">Sincronizar</button>
+        </div>
+    </section>
+
+    <section id="screen-edit-day" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="showScreen('screen-routine-manager')" class="text-zinc-500 text-2xl">←</button>
+            <h2 class="text-xl font-black uppercase italic tracking-tight">Editar Día</h2>
+        </div>
+        <div class="space-y-6">
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-2 block">Nombre del Bloque</label>
+                <input type="text" value="Día 1: Arranque en pecho" class="w-full !text-left px-4 !h-14 !text-lg !w-full border-zinc-800">
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest block mb-4">Ejercicios y Orden</label>
+                <div class="flex items-center gap-3 p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+                    <svg class="brand-yellow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><polygon points="8 6 5 9 8 12" fill="currentColor"/><polygon points="16 12 19 15 16 18" fill="currentColor"/></svg>
+                    <span class="flex-1 font-bold italic uppercase text-xs">Pecho Plano Smith</span>
+                    <button class="brand-yellow font-black text-base">✕</button>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+                    <svg class="brand-yellow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><polygon points="8 6 5 9 8 12" fill="currentColor"/><polygon points="16 12 19 15 16 18" fill="currentColor"/></svg>
+                    <span class="flex-1 font-bold italic uppercase text-xs">Dorsal Adelante</span>
+                    <button class="brand-yellow font-black text-base">✕</button>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+                    <svg class="brand-yellow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><polygon points="8 6 5 9 8 12" fill="currentColor"/><polygon points="16 12 19 15 16 18" fill="currentColor"/></svg>
+                    <span class="flex-1 font-bold italic uppercase text-xs">Hombros Arriba Maquina</span>
+                    <button class="brand-yellow font-black text-base">✕</button>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-zinc-900 rounded-xl border border-zinc-800">
+                    <svg class="brand-yellow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/><polygon points="8 6 5 9 8 12" fill="currentColor"/><polygon points="16 12 19 15 16 18" fill="currentColor"/></svg>
+                    <span class="flex-1 font-bold italic uppercase text-xs">Cuadriceps Camilla</span>
+                    <button class="brand-yellow font-black text-base">✕</button>
+                </div>
+                <button onclick="showScreen('screen-exercise-library', null, 'select')" class="w-full py-3 border border-dashed border-zinc-800 rounded-xl brand-yellow font-bold text-[10px] uppercase tracking-widest">+ Añadir Ejercicio</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-create-exercise" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="showScreen('screen-exercise-library')" class="text-zinc-500 text-2xl">←</button>
+            <h2 class="text-xl font-black uppercase italic tracking-tight">Nuevo Ejercicio</h2>
+        </div>
+        <div class="space-y-6">
+            <div>
+                <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-2 block">Nombre</label>
+                <input type="text" placeholder="Ej: Press Francés" class="w-full !text-left px-4 !h-14 !text-lg !w-full border-zinc-800">
+            </div>
+            <div class="flex gap-3">
+                <div class="flex-1">
+                    <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-2 block">Grupo Muscular</label>
+                    <select class="w-full !text-left px-4 !h-14 !text-base !w-full border-zinc-800">
+                        <option>Pecho</option><option>Espalda</option><option>Hombros</option><option>Piernas</option><option>Brazos</option><option>Otros</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mb-2 block">Incremento (kg)</label>
+                    <input type="number" placeholder="2.5" class="w-full !text-center px-4 !h-14 !text-base !w-full border-zinc-800">
+                </div>
+            </div>
+            <button onclick="showScreen('screen-exercise-library')" class="w-full py-4 bg-brand-yellow text-black rounded-xl font-black italic uppercase text-xs shadow-lg">Crear y Guardar</button>
+        </div>
+    </section>
+
+    <section id="screen-full-history" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="showScreen('screen-routine-manager')" class="text-zinc-500 text-2xl">←</button>
+            <h2 class="text-xl font-black uppercase italic tracking-tight">Sesiones</h2>
+        </div>
+        <div class="border-t border-zinc-900">
+            <div class="session-row">
+                <div class="row-top">
+                    <span class="font-bold uppercase text-xs">VIERNES 6 FEB</span>
+                    <div class="flex items-center gap-2">
+                        <span class="brand-yellow font-mono text-xs">4/4 ✓</span>
+                        <span class="brand-yellow font-mono text-xs">83' ⏱</span>
+                        <button class="brand-yellow font-black text-base ml-1">✕</button>
+                    </div>
+                </div>
+                <div class="row-bottom">
+                    <span class="text-zinc-400 text-xs italic font-semibold">Full Body Dual - Día 1: Arranque en pecho</span>
+                </div>
+            </div>
+            <div class="session-row">
+                <div class="row-top">
+                    <span class="font-bold uppercase text-xs">MIÉRCOLES 4 FEB</span>
+                    <div class="flex items-center gap-2">
+                        <span class="brand-yellow font-mono text-xs">3/4 ✓</span>
+                        <span class="brand-yellow font-mono text-xs">72' ⏱</span>
+                        <button class="brand-yellow font-black text-base ml-1">✕</button>
+                    </div>
+                </div>
+                <div class="row-bottom">
+                    <span class="text-zinc-400 text-xs italic font-semibold">Full Body Dual - Día 2: Arranque en hombros</span>
+                </div>
+            </div>
+            <div class="session-row">
+                <div class="row-top">
+                    <span class="font-bold uppercase text-xs">LUNES 2 FEB</span>
+                    <div class="flex items-center gap-2">
+                        <span class="brand-yellow font-mono text-xs">4/4 ✓</span>
+                        <span class="brand-yellow font-mono text-xs">85' ⏱</span>
+                        <button class="brand-yellow font-black text-base ml-1">✕</button>
+                    </div>
+                </div>
+                <div class="row-bottom">
+                    <span class="text-zinc-400 text-xs italic font-semibold">Full Body Dual - Día 1: Arranque en pecho</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="screen-exercise-library" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-6">
+            <button onclick="libraryGoBack()" class="text-zinc-500 text-2xl">←</button>
+            <h2 class="text-xl font-black uppercase italic">Biblioteca</h2>
+        </div>
+        <div class="mb-6">
+            <select class="w-full !text-left px-4 !h-12 !text-sm !w-full border-zinc-800 opacity-80">
+                <option>Mostrar Todos</option>
+                <option>Pecho</option>
+                <option>Espalda</option>
+                <option>Hombros</option>
+                <option>Piernas</option>
+                <option>Brazos</option>
+                <option>Otros</option>
+            </select>
+        </div>
+        <div class="space-y-2" id="exercise-list">
+            <div class="p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg flex items-center gap-3">
+                <input type="checkbox" class="library-checkbox hidden accent-yellow-500 w-5 h-5">
+                <div class="flex-1 flex justify-between">
+                    <span class="text-sm font-bold italic uppercase">Aperturas con Mancuernas</span>
+                    <span class="text-[9px] text-zinc-600 font-bold uppercase">Pecho</span>
+                </div>
+            </div>
+            <div class="p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg flex items-center gap-3">
+                <input type="checkbox" class="library-checkbox hidden accent-yellow-500 w-5 h-5">
+                <div class="flex-1 flex justify-between">
+                    <span class="text-sm font-bold italic uppercase">Biceps Barra Z</span>
+                    <span class="text-[9px] text-zinc-600 font-bold uppercase">Brazos</span>
+                </div>
+            </div>
+            <div class="p-3 bg-zinc-900/50 border border-zinc-800 rounded-lg flex items-center gap-3">
+                <input type="checkbox" class="library-checkbox hidden accent-yellow-500 w-5 h-5">
+                <div class="flex-1 flex justify-between">
+                    <span class="text-sm font-bold italic uppercase">Crunches Abdominales</span>
+                    <span class="text-[9px] text-zinc-600 font-bold uppercase">Otros</span>
+                </div>
+            </div>
+        </div>
+        <button onclick="showScreen('screen-create-exercise')" class="w-full mt-6 py-4 border border-dashed border-zinc-800 rounded-xl brand-yellow font-bold text-[10px] uppercase tracking-widest">+ Crear Nuevo Ejercicio</button>
+        <button id="library-add-button" class="hidden w-full mt-4 py-4 bg-brand-yellow text-black rounded-xl font-black italic uppercase text-xs tracking-widest shadow-lg">Agregar</button>
+    </section>
+
+    <section id="screen-sync" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
+        <div class="flex items-center gap-4 mb-10">
+            <button onclick="showScreen('screen-routine-manager')" class="text-zinc-500 text-2xl">←</button>
+            <h2 class="text-xl font-black uppercase italic">Sincronización</h2>
+        </div>
+        <div class="space-y-8">
+            <div class="p-6 bg-zinc-900 rounded-2xl border border-zinc-800 text-center">
+                <div class="w-16 h-16 bg-zinc-800 rounded-full mx-auto mb-4 flex items-center justify-center">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="#eab308"><path d="M12.48 10.92v3.28h4.74c-.2 1.06-.9 1.95-2.04 2.71-1.14.76-2.58 1.16-4.18 1.16-3.11 0-5.74-2.11-6.68-4.96-.22-.66-.35-1.36-.35-2.11s.13-1.45.35-2.11c.94-2.85 3.57-4.96 6.68-4.96 1.76 0 3.35.63 4.6 1.83l2.5-2.5C16.51 1.76 14.39 1 12 1 7.21 1 3.16 3.86 1.45 8h.02c-.13.63-.22 1.3-.22 2s.09 1.37.22 2h-.02c1.71 4.14 5.76 7 10.55 7 2.94 0 5.42-.97 7.22-2.62 1.94-1.78 3.11-4.48 3.11-7.62 0-.48-.04-.94-.13-1.38h-10.49z"/></svg>
+                </div>
+                <h3 class="font-bold text-sm uppercase mb-1">Google Cloud Sync</h3>
+                <p class="text-zinc-500 text-[10px] mb-6 tracking-wide">Sincroniza tus datos con Google Drive</p>
+                <button class="w-full py-3 bg-white text-black rounded-xl font-black uppercase text-[10px] tracking-widest">Iniciar Sesión</button>
+            </div>
+            <div class="space-y-3">
+                <label class="text-[10px] text-zinc-500 uppercase font-bold tracking-widest block">Copia de Seguridad Local</label>
+                <button class="w-full py-4 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-zinc-200 uppercase text-[10px] tracking-widest text-left px-6 flex justify-between">
+                    Exportar JSON <span>↓</span>
+                </button>
+                <button class="w-full py-4 bg-zinc-900 border border-zinc-800 rounded-xl font-bold text-zinc-200 uppercase text-[10px] tracking-widest text-left px-6 flex justify-between">
+                    Importar JSON <span>↑</span>
+                </button>
+            </div>
+        </div>
+        <div class="mt-20 text-center">
+            <p class="text-[9px] text-zinc-700 font-bold uppercase tracking-[0.4em]">GymPro v1.0.0</p>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    let libraryMode = 'view';
+
+    function showScreen(id, title = null, mode = null) {
+        document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+        const target = document.getElementById(id);
+        if (target) target.classList.remove('hidden');
+        if (title && id === 'screen-list') document.getElementById('list-title').innerText = title;
+        if (title && id === 'screen-exercise') document.getElementById('exercise-title').innerText = title;
+        
+        if (id === 'screen-exercise-library' && mode) {
+            libraryMode = mode;
+            const checkboxes = document.querySelectorAll('.library-checkbox');
+            const addButton = document.getElementById('library-add-button');
+            
+            if (mode === 'select') {
+                checkboxes.forEach(cb => cb.classList.remove('hidden'));
+                addButton.classList.remove('hidden');
+            } else {
+                checkboxes.forEach(cb => cb.classList.add('hidden'));
+                addButton.classList.add('hidden');
+            }
+        }
+    }
+
+    function libraryGoBack() {
+        if (libraryMode === 'select') {
+            showScreen('screen-edit-day');
+        } else {
+            showScreen('screen-routine-manager');
+        }
+    }
+</script>
+</body>
+</html>
