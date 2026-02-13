@@ -38,6 +38,7 @@
         }
 
         .brand-yellow { color: #eab308; }
+        .brand-green { color: green; }
         .bg-brand-yellow { background-color: #eab308; }
         .border-brand-yellow { border-color: #eab308; }
         .bg-soft-red { background-color: #b91c1c; }
@@ -92,10 +93,52 @@
             background-color: #161616;
         }
 
-        .session-row { display: flex; flex-direction: column; padding: 14px 12px; font-family: monospace; font-size: 12px; position: relative; gap: 6px; }
-        .session-row:nth-child(odd) { background-color: #161616; }
-        .session-row .row-top { display: flex; justify-content: space-between; width: 100%; align-items: center; }
-        .session-row .row-bottom { display: flex; width: 100%; }
+        .history-content {
+            padding-right: 10px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .session-row {
+            display: flex;
+            flex-direction: column;
+            padding: 16px 12px;
+            font-family: monospace;
+            font-size: 12px;
+            position: relative;
+        }
+
+        .session-row:nth-child(odd) {
+            background-color: #161616;
+        }
+
+        .session-row .row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-row .row-bottom {
+            display: flex;
+        }
+
+        .session-content {
+            padding-right: 36px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .session-delete {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
     </style>
 </head>
 <body>
@@ -335,7 +378,7 @@
                 <!-- ROW TEMPLATE -->
                 <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
 
-                    <div class="pr-4 w-full">
+                    <div class="history-content">
 
                         <div class="text-xs font-mono font-bold">
                             VIERNES 6 FEB <span class="text-zinc-700">(Pos #1)</span>
@@ -357,7 +400,7 @@
 
                 <!-- ROW -->
                 <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
-                    <div class="pr-4 w-full">
+                    <div class="history-content">
                         <div class="text-xs font-mono font-bold">
                             MIÉRCOLES 4 FEB <span class="text-zinc-700">(Pos #2)</span>
                         </div>
@@ -374,7 +417,7 @@
 
                 <!-- ROW -->
                 <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
-                    <div class="pr-4 w-full">
+                    <div class="history-content">
                         <div class="text-xs font-mono font-bold">
                             LUNES 2 FEB <span class="text-zinc-700">(Pos #1)</span>
                         </div>
@@ -391,7 +434,7 @@
 
                 <!-- ROW -->
                 <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
-                    <div class="pr-4 w-full">
+                    <div class="history-content">
                         <div class="text-xs font-mono font-bold">
                             VIERNES 30 ENE <span class="text-zinc-700">(Pos #2)</span>
                         </div>
@@ -408,7 +451,7 @@
 
                 <!-- ROW CON COMENTARIO -->
                 <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
-                    <div class="pr-4 w-full">
+                    <div class="history-content">
                         <div class="text-xs font-mono font-bold">
                             MIERCOLES 28 ENE <span class="text-zinc-700">(Pos #1)</span>
                         </div>
@@ -428,7 +471,7 @@
 
                 <!-- ROW -->
                 <div class="history-row border-b border-zinc-900 grid grid-cols-[1fr_auto] gap-2 items-center">
-                    <div class="pr-4 w-full">
+                    <div class="history-content">
                         <div class="text-xs font-mono font-bold">
                             LUNES 26 ENE <span class="text-zinc-700">(Pos #2)</span>
                         </div>
@@ -554,48 +597,66 @@
             <button onclick="showScreen('screen-routine-manager')" class="text-zinc-500 text-2xl">←</button>
             <h2 class="text-xl font-black uppercase italic tracking-tight">Sesiones</h2>
         </div>
+
         <div class="border-t border-zinc-900">
+
             <div class="session-row">
-                <div class="row-top">
-                    <span class="font-bold uppercase text-xs">VIERNES 6 FEB</span>
-                    <div class="flex items-center gap-2">
-                        <span class="brand-yellow font-mono text-xs">4/4 ✓</span>
-                        <span class="brand-yellow font-mono text-xs">83' ⏱</span>
-                        <button class="brand-yellow font-black text-base ml-1">✕</button>
+                <div class="session-content">
+                    <div class="row-top">
+                        <span class="font-bold uppercase text-xs">VIERNES 6 FEB</span>
+                        <div class="flex items-center gap-5">
+                            <span class="brand-yellow font-mono text-xs">4/4 ✓</span>
+                            <span class="brand-yellow font-mono text-xs">83' ⏱</span>
+                        </div>
+                    </div>
+                    <div class="row-bottom">
+                        <span class="text-zinc-400 text-xs italic font-semibold">
+                            Full Body Dual - Día 1: Arranque en pecho
+                        </span>
                     </div>
                 </div>
-                <div class="row-bottom">
-                    <span class="text-zinc-400 text-xs italic font-semibold">Full Body Dual - Día 1: Arranque en pecho</span>
-                </div>
+                <button class="session-delete brand-yellow font-black text-base">✕</button>
             </div>
+
             <div class="session-row">
-                <div class="row-top">
-                    <span class="font-bold uppercase text-xs">MIÉRCOLES 4 FEB</span>
-                    <div class="flex items-center gap-2">
-                        <span class="brand-yellow font-mono text-xs">3/4 ✓</span>
-                        <span class="brand-yellow font-mono text-xs">72' ⏱</span>
-                        <button class="brand-yellow font-black text-base ml-1">✕</button>
+                <div class="session-content">
+                    <div class="row-top">
+                        <span class="font-bold uppercase text-xs">MIÉRCOLES 4 FEB</span>
+                        <div class="flex items-center gap-5">
+                            <span class="brand-yellow font-mono text-xs">3/4 ✓</span>
+                            <span class="brand-yellow font-mono text-xs">72' ⏱</span>
+                        </div>
+                    </div>
+                    <div class="row-bottom">
+                        <span class="text-zinc-400 text-xs italic font-semibold">
+                            Full Body Dual - Día 2: Arranque en hombros
+                        </span>
                     </div>
                 </div>
-                <div class="row-bottom">
-                    <span class="text-zinc-400 text-xs italic font-semibold">Full Body Dual - Día 2: Arranque en hombros</span>
-                </div>
+                <button class="session-delete brand-yellow font-black text-base">✕</button>
             </div>
+
             <div class="session-row">
-                <div class="row-top">
-                    <span class="font-bold uppercase text-xs">LUNES 2 FEB</span>
-                    <div class="flex items-center gap-2">
-                        <span class="brand-yellow font-mono text-xs">4/4 ✓</span>
-                        <span class="brand-yellow font-mono text-xs">85' ⏱</span>
-                        <button class="brand-yellow font-black text-base ml-1">✕</button>
+                <div class="session-content">
+                    <div class="row-top">
+                        <span class="font-bold uppercase text-xs">LUNES 2 FEB</span>
+                        <div class="flex items-center gap-5">
+                            <span class="brand-yellow font-mono text-xs">4/4 ✓</span>
+                            <span class="brand-yellow font-mono text-xs">85' ⏱</span>
+                        </div>
+                    </div>
+                    <div class="row-bottom">
+                        <span class="text-zinc-400 text-xs italic font-semibold">
+                            Full Body Dual - Día 1: Arranque en pecho
+                        </span>
                     </div>
                 </div>
-                <div class="row-bottom">
-                    <span class="text-zinc-400 text-xs italic font-semibold">Full Body Dual - Día 1: Arranque en pecho</span>
-                </div>
+                <button class="session-delete brand-yellow font-black text-base">✕</button>
             </div>
+
         </div>
     </section>
+
 
     <section id="screen-exercise-library" class="hidden p-6 flex-1 overflow-y-auto hide-scrollbar">
         <div class="flex items-center gap-4 mb-6">
